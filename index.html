@@ -1,0 +1,216 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>cannot lie — WILLL</title>
+    <meta property="og:title" content="cannot lie — WILLL">
+    <meta property="og:description" content="Official music video · A abrir no YouTube...">
+    <style>
+        :root {
+            --bg: #11100e;
+            --surface: #191714;
+            --ink: #efeae0;
+            --muted: #9e9689;
+            --accent: #d8c8a8;
+            --border: rgba(239, 234, 224, 0.14);
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html, body {
+            min-height: 100%;
+            margin: 0;
+            background-color: var(--bg);
+            color: var(--ink);
+            font-family: Georgia, "Times New Roman", serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            cursor: pointer;
+            -webkit-tap-highlight-color: transparent;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Vinheta suave + textura subtil tipo película */
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(circle at center, transparent 42%, rgba(0, 0, 0, 0.72) 100%),
+                repeating-radial-gradient(circle at 20% 30%, rgba(239, 234, 224, 0.03) 0, rgba(239, 234, 224, 0.03) 1px, transparent 1px, transparent 4px);
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .card {
+            position: relative;
+            z-index: 2;
+            max-width: 420px;
+            width: calc(100% - 40px);
+            padding: 36px 28px;
+            background: rgba(25, 23, 20, 0.78);
+            border: 1px solid var(--border);
+            border-radius: 2px;
+            backdrop-filter: blur(4px);
+        }
+
+        .eyebrow {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 11px;
+            letter-spacing: 0.22em;
+            text-transform: uppercase;
+            color: var(--muted);
+            margin-bottom: 14px;
+        }
+
+        .loader {
+            width: 34px;
+            height: 34px;
+            margin: 0 auto 22px;
+            border: 1px solid rgba(216, 200, 168, 0.22);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1.35s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        h1 {
+            font-size: 28px;
+            font-weight: 400;
+            font-style: italic;
+            letter-spacing: 0.02em;
+            margin: 0 0 6px;
+        }
+
+        .artist {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 13px;
+            letter-spacing: 0.14em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin: 0 0 18px;
+        }
+
+        p {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            color: var(--muted);
+            font-size: 13px;
+            line-height: 1.55;
+            margin: 6px 0;
+        }
+
+        p b {
+            color: var(--ink);
+            font-weight: 500;
+        }
+
+        .btn {
+            display: inline-block;
+            margin-top: 22px;
+            padding: 11px 26px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+            font-size: 12px;
+            font-weight: 600;
+            letter-spacing: 0.16em;
+            text-transform: uppercase;
+            text-decoration: none;
+            color: var(--bg);
+            background-color: var(--accent);
+            border: 1px solid var(--accent);
+            border-radius: 1px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+        }
+
+        .btn:hover {
+            background-color: transparent;
+            color: var(--accent);
+        }
+
+        .fallback-note {
+            margin-top: 14px;
+            font-size: 11px;
+            color: rgba(158, 150, 137, 0.72);
+        }
+    </style>
+</head>
+<body>
+
+    <main class="card">
+        <div class="eyebrow">Official Music Video</div>
+        <div class="loader" aria-hidden="true"></div>
+        <h1>cannot lie</h1>
+        <div class="artist">WILLL</div>
+        <p>A abrir a app do YouTube...</p>
+        <p>Se não abrir sozinho, <b>toca em qualquer lado do ecrã</b>.</p>
+        <a id="yt-link" class="btn" href="https://www.youtube.com/watch?v=NmV2XEtUD3A" rel="noopener noreferrer">Abrir no YouTube</a>
+        <p class="fallback-note" id="status-msg">A preparar redirecionamento...</p>
+    </main>
+
+    <script>
+        const ytID = "NmV2XEtUD3A";
+        const webLink = "https://www.youtube.com/watch?v=" + ytID;
+        const iosLink = "youtube://www.youtube.com/watch?v=" + ytID;
+        const andLink =
+            "intent://www.youtube.com/watch?v=" +
+            ytID +
+            "#Intent;scheme=https;package=com.google.android.youtube;action=android.intent.action.VIEW;S.browser_fallback_url=" +
+            encodeURIComponent(webLink) +
+            ";end;";
+
+        const linkEl = document.getElementById("yt-link");
+        const statusEl = document.getElementById("status-msg");
+        let tentouAuto = false;
+
+        function getTargetUrl() {
+            const ua = navigator.userAgent || navigator.vendor || window.opera || "";
+            if (/Android/i.test(ua)) return andLink;
+            if (/iPhone|iPad|iPod/i.test(ua)) return iosLink;
+            return webLink;
+        }
+
+        function abrirYT(fromUserClick) {
+            const target = getTargetUrl();
+            window.location.href = target;
+            if (!fromUserClick) {
+                setTimeout(() => {
+                    if (!document.hidden && statusEl) {
+                        statusEl.textContent = "Toque no cartão ou no botão para abrir.";
+                    }
+                }, 1500);
+            }
+        }
+
+        linkEl.href = webLink;
+
+        document.body.addEventListener("click", function (e) {
+            if (e.target === linkEl) {
+                const ua = navigator.userAgent || "";
+                if (/Android/i.test(ua) || /iPhone|iPad|iPod/i.test(ua)) {
+                    e.preventDefault();
+                    abrirYT(true);
+                }
+                return;
+            }
+            abrirYT(true);
+        });
+
+        setTimeout(function () {
+            if (!tentouAuto) {
+                tentouAuto = true;
+                abrirYT(false);
+            }
+        }, 400);
+    </script>
+
+</body>
+</html>
